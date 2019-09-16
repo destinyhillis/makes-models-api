@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Makes Models API</title>
+</head>
+<body>
+        <button type="button" onclick="loadXMLDoc()">
+                Get Makes Per Year</button>
+                <p id="makes"></p>
+<!-- <script src="server.js" /> -->
+<script>
+const d = new Date();
+const endingYear = d.getFullYear();
+let years = [];
+let results = [];
+
+for(let i = 1980; i < endingYear + 2; i++){
+    years.push(i);
+}
+
+// figure out why only pulling last year in array
+
+function loadXMLDoc() {
+    var xmlhttp = new XMLHttpRequest();
+
+    for(let i = 0; i < years.length; i++){
+        let apiLink = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=" + years[i];
+        xmlhttp.open("GET", apiLink , true);
+        xmlhttp.send();
+
+        xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(this);
+        myFunction(this);
+        }
+    };
+    }
+}  
+
+function myFunction(xml) {
+    var x, i, xmlDoc, txt;
+    xmlDoc = xml.responseXML;
+    txt = "";
+    x = xmlDoc.getElementsByTagName("text");
+    for (i = 0; i< x.length; i++) {
+        console.log(x[i])
+        txt += x[i].childNodes[0].nodeValue + "<br>";
+
+        function addElement () { 
+        const newDiv = document.createElement("div"); 
+        const newContent = document.createTextNode(x[i]); 
+        newDiv.appendChild(newContent);  
+        var currentDiv = document.getElementById("makes"); 
+        document.body.insertBefore(newDiv, currentDiv); 
+    }
+}
+    // document.getElementById("makes").innerHTML = txt;
+}
+
+</script>
+    
+</body>
+</html>
