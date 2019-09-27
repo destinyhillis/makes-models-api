@@ -10,6 +10,9 @@
         <button type="button" onclick="loadXMLDoc()">
                 Get Makes Per Year</button>
                 <p id="makes"></p>
+
+
+
 <!-- <script src="server.js" /> -->
 <script>
 const d = new Date();
@@ -22,12 +25,14 @@ for(let i = 1980; i < endingYear + 2; i++){
 }
 
 // figure out why only pulling last year in array
+let apiLinksArr = [];
 
 function loadXMLDoc() {
     var xmlhttp = new XMLHttpRequest();
 
     for(let i = 0; i < years.length; i++){
         let apiLink = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=" + years[i];
+        apiLinksArr.push(apiLink);
         xmlhttp.open("GET", apiLink , true);
         xmlhttp.send();
 
@@ -38,7 +43,10 @@ function loadXMLDoc() {
         }
     };
     }
-}  
+    console.log(apiLinksArr, 'links arr')
+
+} 
+
 
 function myFunction(xml) {
     var x, i, xmlDoc, txt;
