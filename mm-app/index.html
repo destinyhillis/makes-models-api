@@ -15,6 +15,11 @@
 
 <!-- <script src="server.js" /> -->
 <script>
+let masterArr = [
+    // year: [make: [models], make: [models]...]
+]
+
+// get years    
 const d = new Date();
 const endingYear = d.getFullYear();
 let years = [];
@@ -24,37 +29,46 @@ for(let i = 1980; i < endingYear + 2; i++){
     years.push(i);
 }
 
-// figure out why only pulling last year in array
+// create api call for each year's makes
 let apiLinksArr = [];
 
 function loadXMLDoc() {
-    var xmlhttp = new XMLHttpRequest();
-
     for(let i = 0; i < years.length; i++){
+        masterArr.push(years[i]);
+        // console.log(years[i])
         let apiLink = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=" + years[i];
         apiLinksArr.push(apiLink);
-        xmlhttp.open("GET", apiLink , true);
-        xmlhttp.send();
-
-        xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            console.log(this);
-        myFunction(this);
-        }
-    };
     }
-    console.log(apiLinksArr, 'links arr')
-
+    // console.log(apiLinksArr, 'links arr');
+    console.log(masterArr, 'master arr')
+    apiCall();
 } 
 
+// make api call for each year's makes
+function apiCall(){
+    const xmlhttp = new XMLHttpRequest();
 
+    apiLinksArr.forEach(link => {
+        xmlhttp.open("GET", link , true);
+        xmlhttp.send();
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                // console.log(this);
+                myFunction(this);
+            }
+        }
+    }) 
+}
+
+
+// print function
 function myFunction(xml) {
     var x, i, xmlDoc, txt;
     xmlDoc = xml.responseXML;
     txt = "";
     x = xmlDoc.getElementsByTagName("text");
     for (i = 0; i< x.length; i++) {
-        console.log(x[i])
+        // console.log(x[i])
         txt += x[i].childNodes[0].nodeValue + "<br>";
 
         function addElement () { 
@@ -67,6 +81,11 @@ function myFunction(xml) {
 }
     // document.getElementById("makes").innerHTML = txt;
 }
+
+// pull each year's makes x
+    // push into their own array/object
+// pull each make's models
+    // if model was made in year x, add model to that year's object inside the make
 
 </script>
     
