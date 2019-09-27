@@ -15,9 +15,12 @@
 
 <!-- <script src="server.js" /> -->
 <script>
-let masterArr = [
+let masterObj = [
     // year: [make: [models], make: [models]...]
+
 ]
+
+
 
 // get years    
 const d = new Date();
@@ -34,15 +37,29 @@ let apiLinksArr = [];
 
 function loadXMLDoc() {
     for(let i = 0; i < years.length; i++){
-        masterArr.push(years[i]);
-        // console.log(years[i])
+        // console.log(years[i], i, [i])
         let apiLink = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=" + years[i];
         apiLinksArr.push(apiLink);
+
+        let obj = {};
+        obj[years[i]] = years[i];
+
+
+        // for(let x = 0; x < years.length; x++){
+        //     obj[years[i]] = years[i];
+        // }
+        masterObj.push(obj);
     }
     // console.log(apiLinksArr, 'links arr');
-    console.log(masterArr, 'master arr')
+    console.log(masterObj, 'master obj')
     apiCall();
 } 
+
+
+
+
+
+
 
 // make api call for each year's makes
 function apiCall(){
@@ -54,15 +71,13 @@ function apiCall(){
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 // console.log(this);
-                myFunction(this);
+                printFunction(this);
             }
         }
     }) 
 }
 
-
-// print function
-function myFunction(xml) {
+function printFunction(xml) {
     var x, i, xmlDoc, txt;
     xmlDoc = xml.responseXML;
     txt = "";
