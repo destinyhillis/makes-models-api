@@ -36,6 +36,7 @@ for(let i = 1980; i < endingYear + 2; i++){
 let apiLinksArr = [];
 
 function loadXMLDoc() {
+    // makes
     for(let i = 0; i < years.length; i++){
         // console.log(years[i], i, [i])
         let apiLink = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=" + years[i];
@@ -51,58 +52,80 @@ function loadXMLDoc() {
         masterObj.push(obj);
     }
     // console.log(apiLinksArr, 'links arr');
-    console.log(masterObj, 'master obj')
+    // console.log(masterObj, 'master obj')
     apiCall();
+
+    // models
 } 
 
-
-
-
-
-
+let xmlArr = [];
 
 // make api call for each year's makes
 function apiCall(){
-    const xmlhttp = new XMLHttpRequest();
+    for (let i = 0; i < apiLinksArr.length; i++){
+        const xmlhttp = new XMLHttpRequest();
 
-    apiLinksArr.forEach(link => {
-        xmlhttp.open("GET", link , true);
+        xmlhttp.open("GET", apiLinksArr[i] , true);
         xmlhttp.send();
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 // console.log(this);
-                printFunction(this);
+                xmlArr.push(this);
+                // printFunction(this);
+
+            // let xmlDoc = this.responseXML;
+            // let txt = "";
+            // let x = xmlDoc.getElementsByTagName("text");
+            //     // for (let y = 0; y < x.length; y++) {
+            //     //     console.log(link, "link", x[y], "result")
+            //     // }
+            //         console.log(link, xmlDoc)
             }
         }
-    }) 
+    } 
+
+    printFunction(); 
 }
 
-function printFunction(xml) {
-    var x, i, xmlDoc, txt;
-    xmlDoc = xml.responseXML;
-    txt = "";
-    x = xmlDoc.getElementsByTagName("text");
-    for (i = 0; i< x.length; i++) {
-        // console.log(x[i])
-        txt += x[i].childNodes[0].nodeValue + "<br>";
+function printFunction() {
+    // console.log(xmlArr)
+    xmlArr.forEach((xml) => {
+        console.log(xml, 'xml')
+        console.log(xml.responseXML, 'res')
 
-        function addElement () { 
-        const newDiv = document.createElement("div"); 
-        const newContent = document.createTextNode(x[i]); 
-        newDiv.appendChild(newContent);  
-        var currentDiv = document.getElementById("makes"); 
-        document.body.insertBefore(newDiv, currentDiv); 
-    }
+        let xmlDoc = xml.responseXML;
+        let txt = "";
+        let x = xmlDoc.getElementsByTagName("text");
+        for (let y = 0; y < x.length; y++) {
+            console.log(x[y])
+            txt += x[y].childNodes[0].nodeValue + "<br>";
+
+            function addElement () { 
+            const newDiv = document.createElement("div"); 
+            const newContent = document.createTextNode(x[y]); 
+            newDiv.appendChild(newContent);  
+            var currentDiv = document.getElementById("makes"); 
+            document.body.insertBefore(newDiv, currentDiv); 
+            }
+        }
+    })
+
 }
     // document.getElementById("makes").innerHTML = txt;
-}
+
 
 // pull each year's makes x
     // push into their own array/object
 // pull each make's models
     // if model was made in year x, add model to that year's object inside the make
 
+
+
+
+
+
 </script>
     
 </body>
 </html>
+
