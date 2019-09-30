@@ -7,71 +7,62 @@
     <title>Makes Models API</title>
 </head>
 <body>
-        <button type="button" onclick="loadXMLDoc()">
-                Get Makes Per Year</button>
-                <p id="makes"></p>
+    <button type="button" onclick="loadMakeXMLDoc()">Get Makes Per Year</button>
+    <button type="button" onclick="loadModelXMLDoc()">Get Models Per Make</button>
+            
+    <p id="makes"></p>
+    <p id="models"></p>
 
 
 
 <!-- <script src="server.js" /> -->
 <script>
-let masterObj = [
-    // year: [make: [models], make: [models]...]
-
-]
-
-
+let masterObj = [// year: [make: [models], make: [models]...]
+];
+let makeMasterObj = [];
+let modelMasterObj = [];
+let allMakes = [];
 
 // get years    
 const d = new Date();
 const endingYear = d.getFullYear();
 let years = [];
 let results = [];
-
 for(let i = 1980; i < endingYear + 2; i++){
     years.push(i);
 }
 
 // create api call for each year's makes
-let apiLinksArr = [];
+let apiMakeLinksArr = [];
 
-function loadXMLDoc() {
-    // makes
-    for(let i = 0; i < years.length; i++){
-        // console.log(years[i], i, [i])
+const loadMakeXMLDoc = () => {
+    if(masterObj.length < 1){
+        for(let i = 0; i < years.length; i++){
         let apiLink = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=" + years[i];
-        apiLinksArr.push(apiLink);
+        apiMakeLinksArr.push(apiLink);
 
         let obj = {};
-        obj[years[i]] = years[i];
-
-
-        // for(let x = 0; x < years.length; x++){
-        //     obj[years[i]] = years[i];
-        // }
+        obj.year = years[i];
         masterObj.push(obj);
+        }
     }
-    // console.log(apiLinksArr, 'links arr');
-    // console.log(masterObj, 'master obj')
-    apiCall();
-
-    // models
+    apiMakeCall();
 } 
 
-let xmlArr = [];
-
 // make api call for each year's makes
-function apiCall(){
-    for (let i = 0; i < apiLinksArr.length; i++){
+let xmlMakeArr = [];
+
+const apiMakeCall = () => {
+    for (let i = 0; i < apiMakeLinksArr.length; i++){
         const xmlhttp = new XMLHttpRequest();
 
-        xmlhttp.open("GET", apiLinksArr[i] , true);
+        xmlhttp.open("GET", apiMakeLinksArr[i] , true);
         xmlhttp.send();
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
                 // console.log(this);
-                xmlArr.push(this);
-                // printFunction(this);
+                xmlMakeArr.push(this);
+                // printMakes(this);
 
             // let xmlDoc = this.responseXML;
             // let txt = "";
@@ -84,38 +75,115 @@ function apiCall(){
         }
     } 
 
-    printFunction(); 
+    printMakes(); 
 }
 
-function printFunction() {
-    // console.log(xmlArr)
-    xmlArr.forEach((xml) => {
-        console.log(xml, 'xml')
-        console.log(xml.responseXML, 'res')
+const printMakes = () => {
+    console.log('hit')
+    let makeTemp = [];
+    let allMakesTemp = [];
+    xmlMakeArr.forEach((xml) => {
+        let xmlYear = xml.responseURL.slice(xml.responseURL.length -4);
 
         let xmlDoc = xml.responseXML;
-        let txt = "";
+        // let txt = "";
         let x = xmlDoc.getElementsByTagName("text");
-        for (let y = 0; y < x.length; y++) {
-            console.log(x[y])
-            txt += x[y].childNodes[0].nodeValue + "<br>";
 
-            function addElement () { 
-            const newDiv = document.createElement("div"); 
-            const newContent = document.createTextNode(x[y]); 
-            newDiv.appendChild(newContent);  
-            var currentDiv = document.getElementById("makes"); 
-            document.body.insertBefore(newDiv, currentDiv); 
+        let innerTemp = [];
+
+        for (let i = 0; i < x.length; i++) {
+            innerTemp.push(xmlYear);
+            innerTemp.push(x[i].innerHTML);
+            allMakesTemp.push(x[i].innerHTML);
+        }
+        allMakesTemp.sort();
+
+        allMakesTemp.forEach((item, i) => {
+            if(allMakesTemp[i] != allMakesTemp[i+1]){
+                allMakes.push(item);
+            }
+        })
+
+        makeTemp.push(innerTemp);
+        makeMasterObj = (makeTemp);
+    })
+}
+
+// add makes to master obj
+const addMakes = () => {
+
+}
+
+// create api call for each make's models
+let apiModelLinksArr = [];
+
+const loadModelXMLDoc = () => {
+    allMakes.forEach((make) => {
+        years.forEach((year) => {
+            let apiLink = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/model?year=" + year + "&make=" + make;
+            apiModelLinksArr.push(apiLink);
+        })
+    })
+    apiModelCall();
+} 
+
+// make api call for each make's models
+
+// FIND WAY TO MAKE CALLS SMALLER/NOT OVERLOAD SERVER
+let xmlModelArr = [];
+
+const apiModelCall = () => {
+    // let modelLinksSmall = apiModelLinksArr.length / 4;
+
+    apiModelLinksArr.forEach((link, i) => {
+        const xmlhttp = new XMLHttpRequest();
+
+        xmlhttp.open("GET", apiModelLinksArr[0] , true);
+        xmlhttp.send();
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                console.log('link working');
+                xmlModelArr.push(this);
             }
         }
     })
+    console.log(xmlModelArr, 'model arr')
 
+    // printModels(); 
 }
-    // document.getElementById("makes").innerHTML = txt;
 
+const printModels = () => {
+    let makeTemp = [];
+    let allMakesTemp = [];
+    xmlMakeArr.forEach((xml) => {
+        let xmlYear = xml.responseURL.slice(xml.responseURL.length -4);
+
+        let xmlDoc = xml.responseXML;
+        // let txt = "";
+        let x = xmlDoc.getElementsByTagName("text");
+
+        let innerTemp = [];
+
+        for (let i = 0; i < x.length; i++) {
+            innerTemp.push(xmlYear);
+            innerTemp.push(x[i].innerHTML);
+            allMakesTemp.push(x[i].innerHTML);
+        }
+        allMakesTemp.sort();
+
+        allMakesTemp.forEach((item, i) => {
+            if(allMakesTemp[i] != allMakesTemp[i+1]){
+                console.log(item)
+                allMakes.push(item);
+            }
+        })
+        makeTemp.push(innerTemp);
+        makeMasterObj = (makeTemp);
+    })
+}
 
 // pull each year's makes x
-    // push into their own array/object
+    // push into their own array/object x
 // pull each make's models
     // if model was made in year x, add model to that year's object inside the make
 
